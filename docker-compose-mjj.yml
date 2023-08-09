@@ -15,16 +15,17 @@ services:
       - app_data:/data
       - app_log:/app/logs
     environment:
-      - SQL_DSN=root:123456@tcp(mysql:3306)/oneapi
+      # - SQL_DSN="${MY_SQL_DSN}
       - REDIS_CONN_STRING=redis://redis:6379
       - SESSION_SECRET=zxdhqy999
       - TZ=Asia/Shanghai
       - SYNC_FREQUENCY=60
     networks:
       - net-one-api
+    secrets:
+      - sql-dsn
     depends_on:
       - redis
-      - mysql
 
 
   redis:
@@ -34,27 +35,15 @@ services:
     networks:
       - net-one-api
     
-  mysql:
-    image: mysql/mysql-server:8.0.23
-    restart: always
-    command: --bind-address=0.0.0.0
-    container_name: ais-ninja-mysql
-    environment:
-      MYSQL_DATABASE: oneapi
-      MYSQL_USER: root
-      MYSQL_PASSWORD: zxd8200506
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - mysql_log:/etc/mysql/conf.d
-    networks:
-      - net-one-api
-
 networks:
   net-one-api:
     driver: bridge
 
 volumes:
-  mysql_data:
-  mysql_log:
   app_data:
   app_log:
+
+secrets:
+  sql-dsn:
+    external: true
+    name: "SQL_DSN"
